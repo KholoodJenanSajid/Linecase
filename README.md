@@ -3,10 +3,12 @@ title: Linecase
 emoji: 🛠
 colorFrom: gray
 colorTo: red
-sdk: docker
-app_port: 8080
+sdk: gradio
+sdk_version: 5.20.1
+app_file: app.py
 pinned: false
 license: mit
+short_description: Photo or notes in, cited work order out
 ---
 
 # Linecase
@@ -90,22 +92,20 @@ Free-tier Gemini allows about 5 requests a minute. Each live case costs two mode
 
 ## Deploy
 
-The repo ships a `Dockerfile` that listens on `$PORT`, so it runs on anything that takes a container.
+Hugging Face **Docker** and **CPU Basic** Gradio Spaces need a paid plan. Free accounts get **Gradio + Blank + ZeroGPU**. Linecase does not use the GPU — Gemini is a remote API — so pick ZeroGPU and leave it unused. Eligible free accounts (verified email, 30+ days old) can host two of these.
 
-**Hugging Face Spaces** — free, public, no billing account. Create a Space (SDK: Docker), add `GOOGLE_API_KEY` under *Settings → Variables and secrets*, then:
+1. Create a public Space named `linecase`.
+2. Settings → Variables and secrets: secret `GOOGLE_API_KEY`, variable `GEMINI_MODEL=gemini-3.6-flash`.
+3. Push this repo:
 
 ```powershell
 git remote add space https://huggingface.co/spaces/<user>/linecase
 git push space main
 ```
 
-**Cloud Run**:
+The live URL is `https://huggingface.co/spaces/<user>/linecase`. The Space also exposes the Gradio app at `https://<user>-linecase.hf.space`.
 
-```powershell
-gcloud run deploy linecase --source . --region asia-southeast1 --allow-unauthenticated --set-env-vars GEMINI_MODEL=gemini-3.6-flash
-```
-
-Pass the key as a secret, not a build arg. Do not bake it into the image.
+Local UI is still FastAPI at `http://localhost:8080`. The Space uses `app.py` so it does not need a paid Docker runtime.
 
 ## API
 
