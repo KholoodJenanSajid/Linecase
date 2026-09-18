@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Linecase — fault to work order</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <header class="top">
+    <div>
+      <p class="mark">LINECASE</p>
+      <p class="sub">Apex Precision · APX-PEN-01 · Penang</p>
+    </div>
+    <p class="live">Public demo plant · not a chatbot</p>
+  </header>
+
+  <main class="grid">
+    <section class="panel">
+      <h1>Open a downtime case</h1>
+      <p class="lede">
+        Photo or notes from the floor. Agents see, retrieve plant SOPs, then write a cited work order — LOTO, parts, CMMS payload.
+      </p>
+      <form id="form">
+        <label>Operator notes</label>
+        <textarea id="notes" rows="6" placeholder="What the operator actually said…"></textarea>
+        <div class="row">
+          <div>
+            <label>Language out</label>
+            <select id="language">
+              <option>English</option>
+              <option>Malay</option>
+              <option>Japanese</option>
+              <option>Mandarin</option>
+              <option>Tamil</option>
+            </select>
+          </div>
+          <div>
+            <label>Photo (optional)</label>
+            <input id="image" type="file" accept="image/*" />
+          </div>
+        </div>
+        <div class="demos">
+          <button type="button" data-demo="spindle">Demo: spindle overtemp</button>
+          <button type="button" data-demo="conveyor">Demo: conveyor jam</button>
+          <button type="button" data-demo="sealer">Demo: sealer / 日本語</button>
+        </div>
+        <button type="submit" class="go" id="go">File case</button>
+        <p id="status" class="status"></p>
+      </form>
+    </section>
+
+    <section class="panel dossier" id="dossier">
+      <p class="empty">No case yet. Run a demo — 3 minutes of judge time should start here, not in a slide.</p>
+    </section>
+  </main>
+
+  <footer>
+    LangGraph · Gemini · plant RAG · Cloud Run. Built for Google Cloud AI Builder Cup JAPAC · Manufacturing.
+  </footer>
+  <script src="/static/app.js"></script>
+</body>
+</html>
