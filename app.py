@@ -7,9 +7,22 @@ import json
 import gradio as gr
 from dotenv import load_dotenv
 
+try:  # Only present on Hugging Face Spaces.
+    import spaces
+except ImportError:
+    spaces = None
+
 load_dotenv()
 
 from app.service import DEMOS, CaseError, file_case, read_image
+
+
+if spaces is not None:
+    # ZeroGPU refuses to start without a GPU-decorated function. Linecase does its
+    # model work through the Gemini API, so this stays unused and burns no quota.
+    @spaces.GPU(duration=1)
+    def _zerogpu_probe() -> str:
+        return "linecase runs on the Gemini API, not local GPU"
 
 
 def _bullets(items: list[str]) -> list[str]:
