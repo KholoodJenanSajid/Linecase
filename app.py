@@ -12,8 +12,16 @@ load_dotenv()
 from app.service import DEMOS, CaseError, file_case, read_image
 
 
+def _bullets(items: list[str]) -> list[str]:
+    return items or ["- _(none)_"]
+
+
 def _format(result) -> str:
     wo = result.work_order
+    loto = _bullets([f"- {step}" for step in wo.loto])
+    steps = _bullets([f"{s.order}. **{s.owner}** — {s.action}" for s in wo.steps])
+    parts = _bullets([f"- `{p.sku}` {p.name} · bin `{p.bin}` · qty {p.qty}" for p in wo.parts])
+    citations = _bullets([f"- **{c.source}** — {c.excerpt}" for c in wo.citations])
     lines = [
         f"# {result.case_id} · {wo.title}",
         f"**Plant** {result.plant} · **Asset** `{wo.asset_id}` · **Severity** {wo.severity} · **Mode** {result.mode}",
@@ -26,17 +34,16 @@ def _format(result) -> str:
         wo.root_cause,
         "",
         "## LOTO",
-        *[f"- {step}" for step in wo.loto] or ["- _(none)_"],
+        *loto,
         "",
         "## Steps",
-        *[f"{s.order}. **{s.owner}** — {s.action}" for s in wo.steps],
+        *steps,
         "",
         "## Parts",
-        *[f"- `{p.sku}` {p.name} · bin `{p.bin}` · qty {p.qty}" for p in wo.parts]
-        or ["- _(none)_"],
+        *parts,
         "",
         "## Citations",
-        *[f"- **{c.source}** — {c.excerpt}" for c in wo.citations] or ["- _(none)_"],
+        *citations,
         "",
         "## Agent trace",
         " → ".join(result.agent_trace) if result.agent_trace else "_(empty)_",
