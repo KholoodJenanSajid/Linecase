@@ -1,10 +1,21 @@
+---
+title: Linecase
+emoji: 🛠
+colorFrom: gray
+colorTo: red
+sdk: docker
+app_port: 8080
+pinned: false
+license: mit
+---
+
 # Linecase
 
 A downtime case file, not a chatbot.
 
 On a real shop floor, a fault still lives in WhatsApp videos, paper SOPs, and one supervisor's head. Linecase takes a photo or a messy operator note and files a **work order**: what happened, which manuals say so, lockout steps, parts with real bin numbers, and a CMMS payload. In the operator's language.
 
-This is a working prototype for the [Google Cloud AI Builder Cup 2026](https://aibuildercup.com/) manufacturing track. The plant is fictional. The workflow is not.
+This is a working prototype running against a seeded reference plant. The plant is fictional. The workflow is not.
 
 ## What you get back
 
@@ -21,7 +32,7 @@ Bin locations come from the parts catalog, not the model. If Gemini invents a sh
 
 ## The plant
 
-**Apex Precision, Penang (`APX-PEN-01`)** — a JAPAC contract manufacturer. Three assets, closed-world manuals:
+**Apex Precision, Penang (`APX-PEN-01`)** — a contract manufacturer. Three assets, closed-world manuals:
 
 | Asset | What goes wrong |
 | --- | --- |
@@ -39,7 +50,7 @@ see  →  retrieve  →  act  →  catalog
 
 Gemini (default `gemini-3.6-flash`) describes the scene, Chroma / keyword search pulls SOPs, LangGraph drafts the work order, then `app/catalog.py` reconciles every part against `data/corpus/parts-catalog.md`.
 
-Stack: FastAPI, LangGraph, `langchain-google-genai`, Chroma, a static case-file UI, Docker for Cloud Run.
+Stack: FastAPI, LangGraph, `langchain-google-genai`, Chroma, a static case-file UI, Docker.
 
 ## Run it
 
@@ -73,17 +84,28 @@ Open [http://localhost:8080](http://localhost:8080). Click **Demo: spindle overt
 
 ### If you don't have a key yet
 
-Leave `GOOGLE_API_KEY` as the placeholder, or set `LINECASE_OFFLINE=1`. The API still returns a real work-order shape from canned fixtures, stamped `mode: "offline"`. Useful for UI work. Do not record a demo video of it.
+Leave `GOOGLE_API_KEY` as the placeholder, or set `LINECASE_OFFLINE=1`. The API still returns a real work-order shape from canned fixtures, stamped `mode: "offline"`. Useful for UI work, not for evaluating the reasoning.
 
 Free-tier Gemini allows about 5 requests a minute. Each live case costs two model calls, so wait a minute between runs if you hit a 429.
 
 ## Deploy
 
+The repo ships a `Dockerfile` that listens on `$PORT`, so it runs on anything that takes a container.
+
+**Hugging Face Spaces** — free, public, no billing account. Create a Space (SDK: Docker), add `GOOGLE_API_KEY` under *Settings → Variables and secrets*, then:
+
 ```powershell
-gcloud run deploy linecase --source . --region asia-southeast1 --allow-unauthenticated --set-env-vars GOOGLE_API_KEY=YOUR_KEY,GEMINI_MODEL=gemini-3.6-flash
+git remote add space https://huggingface.co/spaces/<user>/linecase
+git push space main
 ```
 
-Do not bake the key into the image.
+**Cloud Run**:
+
+```powershell
+gcloud run deploy linecase --source . --region asia-southeast1 --allow-unauthenticated --set-env-vars GEMINI_MODEL=gemini-3.6-flash
+```
+
+Pass the key as a secret, not a build arg. Do not bake it into the image.
 
 ## API
 
